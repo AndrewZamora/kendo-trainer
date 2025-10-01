@@ -11,7 +11,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { detector, detect, poses, start: startPose } = usePose();
+const { detector, detect, poses, start: startPose, drawSkeleton } = usePose();
 const { videoRef, startStream } = useVideo();
 const {
   canvasRef,
@@ -29,7 +29,9 @@ const drawVideo = (
   context.drawImage(videoRef, 0, 0);
 };
 
-const drawShapes = (context: CanvasRenderingContext2D) => {};
+const drawShapes = (context: CanvasRenderingContext2D) => {
+
+};
 
 const draw = () => {
   if (!context.value || !videoRef.value) return;
