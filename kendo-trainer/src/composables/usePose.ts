@@ -13,19 +13,24 @@ export function usePose() {
 
     let detector = shallowRef<any | null>(null);
     let poses = ref<null | any[]>(null);
+    let skeleton = ref<null | any[]>(null);
 
     const start = async (video: HTMLVideoElement) => {
         const _detector = await poseDetection.createDetector(model, detectorConfig);
         const _poses = await _detector.estimatePoses(video);
         detector.value = _detector;
         poses.value = _poses
-        console.log(detector, _poses, poses.value)
-        console.log({ _poses })
+        for (const pose of _poses) {
+            buildSkeleton(pose);
+        }
     }
     async function detect(video: HTMLVideoElement) {
         if (detector.value) {
             const _poses = await detector.value.estimatePoses(video);
             poses.value = _poses;
+            for (const pose of _poses) {
+                skeleton.value = buildSkeleton(pose);
+            }
         }
     }
     const dispose = () => {
@@ -34,22 +39,20 @@ export function usePose() {
             detector.value = null;
         }
     }
-    const drawSkeleton = (pose:PoseNetPose['pose']) => {
-        poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.BlazePose).forEach((pair) => {
-
+    const buildSkeleton = (pose: poseDetection.Pose) => {
+        return poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.BlazePose).map((pair) => {
+            const [a, b] = pair;
+            const bodyPointA = pose.keypoints[a];
+            const bodyPointB = pose.keypoints[b];
+            return [bodyPointA, bodyPointB];
         });
     }
-
-
-    onMounted(async () => {
-        // console.log(_detector)
-    });
 
     return {
         start,
         detect,
         dispose,
-        drawSkeleton,
+        skeleton,
         detector,
         poses,
     }

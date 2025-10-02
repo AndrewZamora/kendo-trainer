@@ -11,7 +11,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { detector, detect, poses, start: startPose, drawSkeleton } = usePose();
+const skeletonColor = "#16FF00";
+const { detector, detect, poses, start: startPose, skeleton } = usePose();
 const { videoRef, startStream } = useVideo();
 const {
   canvasRef,
@@ -29,8 +30,24 @@ const drawVideo = (
   context.drawImage(videoRef, 0, 0);
 };
 
-const drawShapes = (context: CanvasRenderingContext2D) => {
+const drawSkeleton = (context: CanvasRenderingContext2D, skeleton: any) => {
+  context.fillStyle = skeletonColor;
+  context.strokeStyle = skeletonColor;
+  context.lineWidth = 5;
+  context.lineCap = "round";
+  context.beginPath();
+  for (const connection of skeleton) {
+    let [a, b] = connection;
+    context.moveTo(a.x, a.y);
+    context.lineTo(b.x, b.y);
+  }
+  context.stroke();
+};
 
+const drawShapes = (context: CanvasRenderingContext2D) => {
+  if (skeleton.value && poses.value) {
+    drawSkeleton(context, skeleton.value);
+  }
 };
 
 const draw = () => {
@@ -61,5 +78,9 @@ onMounted(async () => {
   <canvas ref="canvasRef" :width="width" :height="height"></canvas>
   <div v-if="poses">
     {{ poses }}
+  </div>
+  <hr />
+  <div v-if="skeleton">
+    {{ skeleton }}
   </div>
 </template>
