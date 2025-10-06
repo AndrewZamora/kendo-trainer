@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import { useVideo } from "../composables/useVideo";
 import { useCanvas } from "../composables/useCanvas";
 import { usePose } from "../composables/usePose";
+import type { Keypoint } from "@tensorflow-models/pose-detection";
 
 interface Props {
   width: number;
@@ -25,12 +26,15 @@ const {
 
 const drawVideo = (
   context: CanvasRenderingContext2D,
-  videoRef: HTMLVideoElement
+  videoRef: HTMLVideoElement,
 ) => {
   context.drawImage(videoRef, 0, 0);
 };
 
-const drawSkeleton = (context: CanvasRenderingContext2D, skeleton: any) => {
+const drawSkeleton = (
+  context: CanvasRenderingContext2D,
+  skeleton: Keypoint[][],
+) => {
   context.fillStyle = skeletonColor;
   context.strokeStyle = skeletonColor;
   context.lineWidth = 5;
