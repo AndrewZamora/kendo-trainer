@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@mediapipe/pose": "^0.5.1675469404",
@@ -19,6 +20,7 @@
     "@vue/tsconfig": "^0.7.0",
     "typescript": "~5.8.3",
     "vite": "^7.1.2",
+    "vitest": "^3.2.4",
     "vue-tsc": "^3.0.5"
   }
 }
