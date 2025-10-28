@@ -8,9 +8,20 @@ export function usePose() {
     modelType: "full",
     solutionPath: "node_modules/@mediapipe/pose",
   };
-
-  let detector = shallowRef<any | null>(null);
-  let poses = ref<null | any[]>(null);
+  const pose = {
+    right_elbow: { x: "0", y: "0", z: "0", score: "", name: "right_elbow" },
+    right_wrist: { x: "0", y: "0", z: "0", score: "", name: "right_wrist" },
+    right_shoulder: {
+      x: "0",
+      y: "0",
+      z: "0",
+      score: "",
+      name: "right_shoulder",
+    },
+  };
+  let detector = shallowRef<poseDetection.PoseDetector | null>(null);
+  let poses = ref<null | poseDetection.Pose[]>(null);
+  let currentPose = ref<Record<string, poseDetection.Keypoint>>({});
   let skeleton = ref<null | poseDetection.Keypoint[][]>(null);
 
   const start = async (video: HTMLVideoElement) => {
@@ -37,6 +48,14 @@ export function usePose() {
       detector.value = null;
     }
   };
+  const buildCurrentPose = (pose: poseDetection.Pose.keypoints) => {
+    const keypoints = pose;
+    for (const keypoint of keypoints) {
+      if (keypoint.name && currentPose.value[keypoint.name] === keypoint.name) {
+        currentPose.value[keypoints.name] = keypoint;
+      }
+    }
+  };
   const buildSkeleton = (
     pose: poseDetection.Pose,
   ): poseDetection.Keypoint[][] => {
@@ -59,4 +78,3 @@ export function usePose() {
     poses,
   };
 }
-
