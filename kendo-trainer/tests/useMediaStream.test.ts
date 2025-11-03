@@ -1,24 +1,5 @@
 import { it, expect, describe, beforeEach, vi } from "vitest";
-import { ref } from "vue";
-
-function useMediaStream(constraints: MediaStreamConstraints) {
-  const mediaStream = ref<MediaStream | null>(null);
-  const error = ref<Error | null>(null);
-  const requestStream = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      mediaStream.value = stream;
-      return stream;
-    } catch (err) {
-      error.value = err as Error;
-    }
-  };
-  return {
-    mediaStream,
-    error,
-    requestStream,
-  };
-}
+import { useMediaStream } from "../src/composables/useMediaStream";
 
 const fakeMediaDeviceSuccess = () => {
   return {
