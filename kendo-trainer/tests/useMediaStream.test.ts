@@ -16,6 +16,16 @@ const fakeMediaDeviceFailure = () => {
     getUserMedia: vi.fn().mockRejectedValue(new Error("Permission Denied")),
   };
 };
+const track = { stop: vi.fn() };
+const fakeMediaStreamTracks = () => {
+  return {
+    getUserMedia: vi.fn().mockResolvedValue({
+      id: "fake-stream",
+      active: true,
+      getTracks: () => [track],
+    }),
+  };
+};
 
 describe("useMediaStream", () => {
   beforeEach(() => {
@@ -54,5 +64,26 @@ describe("useMediaStream", () => {
     await requestStream();
     expect(mediaStream.value).toBeNull();
     expect(error.value).toEqual(new Error("Permission Denied"));
+  });
+
+  it("stops the stream", async () => {
+    Object.defineProperty(navigator, "mediaDevices", {
+      value: fakeMediaStreamTracks(),
+      writable: true,
+    });
+
+    const { mediaStream, requestStream, stopStream } = useMediaStream({
+      video: true,
+    });
+    await requestStream();
+
+    expect(mediaStream.value).not.toBeNull();
+    const [track] = mediaStream.value!.getTracks();
+    const stopSpy = vi.spyOn(track, "stop");
+
+    stopStream();
+
+    expect(stopSpy).toHaveBeenCalled();
+    expect(mediaStream.value).toBeNull();
   });
 });
